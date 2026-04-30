@@ -105,11 +105,16 @@ export class UserService {
 
         await db.delete(userTable).where(eq(userTable.id, id));
 
-        // For UUID ids, also remove from Supabase Auth so the user cannot log back in.
+        // Best-effort: revoke Supabase Auth credentials so the user cannot log back in.
+        // Errors are intentionally ignored — the local DB record is already gone.
         // Non-UUID ids belong to the legacy auth system and have no Supabase Auth record.
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
         if (isUuid) {
-            await createAdminClient().auth.admin.deleteUser(id);
+            try {
+                await createAdminClient().auth.admin.deleteUser(id);
+            } catch {
+                // ignore
+            }
         }
     }
 }
