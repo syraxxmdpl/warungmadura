@@ -26,6 +26,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { api, type Category, type Product, type ProductCreateInput, ApiError } from "@/lib/warung/api";
+import { IconPlus } from "@tabler/icons-react";
 import { formatRupiah } from "@/lib/warung/format";
 
 type Draft = {
@@ -49,6 +50,8 @@ export function ProductsTable() {
   const [saving, setSaving] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [creatingCategory, setCreatingCategory] = useState(false);
 
   const load = useCallback(async () => {
     const [prods, cats] = await Promise.all([api.products.list(), api.categories.list()]);
@@ -68,7 +71,7 @@ export function ProductsTable() {
     });
   }, [products, search, filterCategory]);
 
-  function openNew() { setDraft(emptyDraft); setOpen(true); }
+  function openNew() { setDraft(emptyDraft); setNewCategoryName(""); setOpen(true); }
   function openEdit(p: Product) {
     setDraft({
       id: p.id, sku: p.sku, name: p.name,
@@ -77,6 +80,23 @@ export function ProductsTable() {
       unit: p.unit, currentStock: p.currentStock, minStock: p.minStock,
     });
     setOpen(true);
+  }
+
+  async function handleCreateCategory() {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    setCreatingCategory(true);
+    try {
+      const created = await api.categories.create({ name });
+      setCategories((prev) => [...prev, created]);
+      setDraft((d) => ({ ...d, categoryId: created.id }));
+      setNewCategoryName("");
+      toast.success(`Kategori "${name}" ditambahkan`);
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Gagal membuat kategori");
+    } finally {
+      setCreatingCategory(false);
+    }
   }
 
   async function handleSave() {
@@ -99,6 +119,7 @@ export function ProductsTable() {
         toast.success("Produk ditambahkan");
       }
       setOpen(false);
+      setNewCategoryName("");
       await load();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Gagal menyimpan produk");
@@ -171,6 +192,25 @@ export function ProductsTable() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <div className="flex gap-1.5 pt-1">
+                    <Input
+                      placeholder="Buat kategori baru…"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleCreateCategory())}
+                      className="h-8 text-sm"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 px-2 shrink-0"
+                      onClick={handleCreateCategory}
+                      disabled={!newCategoryName.trim() || creatingCategory}
+                    >
+                      <IconPlus className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">

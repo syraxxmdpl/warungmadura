@@ -17,8 +17,18 @@ import {
 } from "@/components/ui/table";
 import { api, type SalesReport, type AppUser } from "@/lib/warung/api";
 import { formatDateTime, formatRupiah } from "@/lib/warung/format";
+import { exportReportCSV, exportReportPDF } from "@/lib/warung/export";
+import { IconFileTypeCsv, IconFileTypePdf } from "@tabler/icons-react";
 
 type Period = "today" | "7d" | "30d" | "month" | "custom";
+
+const PERIOD_LABELS: Record<Period, string> = {
+  today: "Hari Ini",
+  "7d": "7 Hari Terakhir",
+  "30d": "30 Hari Terakhir",
+  month: "Bulan Ini",
+  custom: "Custom",
+};
 
 const paymentColor: Record<string, string> = {
   cash: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400",
@@ -34,6 +44,24 @@ export function ReportsScreen() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [report, setReport] = useState<SalesReport | null>(null);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState<"csv" | "pdf" | null>(null);
+
+  const periodLabel = period === "custom" ? `${from} s/d ${to}` : PERIOD_LABELS[period];
+
+  const handleExportCSV = () => {
+    if (!report) return;
+    exportReportCSV(report, periodLabel);
+  };
+
+  const handleExportPDF = async () => {
+    if (!report) return;
+    setExporting("pdf");
+    try {
+      await exportReportPDF(report, periodLabel);
+    } finally {
+      setExporting(null);
+    }
+  };
 
   useEffect(() => { api.users.list().then(setUsers).catch(console.error); }, []);
 
@@ -115,6 +143,28 @@ export function ReportsScreen() {
             <Button onClick={fetchReport} disabled={loading} variant="secondary">
               {loading ? "Memuat..." : "Perbarui"}
             </Button>
+            <div className="flex gap-2 ml-auto">
+              <Button
+                onClick={handleExportCSV}
+                disabled={!report || loading}
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+              >
+                <IconFileTypeCsv className="h-4 w-4" />
+                Export CSV
+              </Button>
+              <Button
+                onClick={handleExportPDF}
+                disabled={!report || loading || exporting === "pdf"}
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+              >
+                <IconFileTypePdf className="h-4 w-4" />
+                {exporting === "pdf" ? "Membuat PDF..." : "Export PDF"}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

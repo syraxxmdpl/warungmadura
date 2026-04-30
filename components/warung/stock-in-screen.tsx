@@ -18,6 +18,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { PackagePlus, Plus, Trash2 } from "lucide-react";
+import { IconPlus } from "@tabler/icons-react";
 import { api, type Product, type Supplier, type StockIn, ApiError } from "@/lib/warung/api";
 import { formatDate, formatRupiah } from "@/lib/warung/format";
 
@@ -32,6 +33,8 @@ export function StockInScreen() {
   const [notes, setNotes] = useState<string>("");
   const [lines, setLines] = useState<DraftLine[]>([{ productId: 0, quantity: 1, unitCost: 0 }]);
   const [submitting, setSubmitting] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState("");
+  const [creatingSupplier, setCreatingSupplier] = useState(false);
 
   const load = useCallback(async () => {
     const [prods, supps, hist] = await Promise.all([
@@ -72,6 +75,23 @@ export function StockInScreen() {
     setLines((cur) => cur.filter((_, idx) => idx !== i));
   }
 
+  async function handleCreateSupplier() {
+    const name = newSupplierName.trim();
+    if (!name) return;
+    setCreatingSupplier(true);
+    try {
+      const created = await api.suppliers.create({ name });
+      setSuppliers((prev) => [...prev, created]);
+      setSupplierId(String(created.id));
+      setNewSupplierName("");
+      toast.success(`Supplier "${name}" ditambahkan`);
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Gagal membuat supplier");
+    } finally {
+      setCreatingSupplier(false);
+    }
+  }
+
   async function handleSubmit() {
     if (lines.some((l) => !l.productId || l.quantity <= 0)) {
       toast.error("Lengkapi semua baris item");
@@ -89,6 +109,7 @@ export function StockInScreen() {
       const first = products[0];
       setLines([{ productId: first?.id ?? 0, quantity: 1, unitCost: Number(first?.purchasePrice ?? 0) }]);
       setNotes("");
+      setNewSupplierName("");
       await load();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Gagal mencatat stok masuk");
@@ -117,6 +138,25 @@ export function StockInScreen() {
                   {suppliers.map((s) => <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>)}
                 </SelectContent>
               </Select>
+              <div className="flex gap-1.5 pt-1">
+                <Input
+                  placeholder="Buat supplier baru…"
+                  value={newSupplierName}
+                  onChange={(e) => setNewSupplierName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleCreateSupplier())}
+                  className="h-8 text-sm"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 px-2 shrink-0"
+                  onClick={handleCreateSupplier}
+                  disabled={!newSupplierName.trim() || creatingSupplier}
+                >
+                  <IconPlus className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label>Tanggal Terima</Label>
