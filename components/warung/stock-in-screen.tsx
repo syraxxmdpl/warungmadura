@@ -27,7 +27,7 @@ export function StockInScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [history, setHistory] = useState<StockIn[] | null>(null);
-  const [supplierId, setSupplierId] = useState<string>("");
+  const [supplierId, setSupplierId] = useState<string>("none");
   const [receivedDate, setReceivedDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState<string>("");
   const [lines, setLines] = useState<DraftLine[]>([{ productId: 0, quantity: 1, unitCost: 0 }]);
@@ -80,7 +80,7 @@ export function StockInScreen() {
     setSubmitting(true);
     try {
       await api.stockIns.create({
-        supplierId: supplierId ? Number(supplierId) : null,
+        supplierId: supplierId && supplierId !== "none" ? Number(supplierId) : null,
         receivedDate,
         notes: notes || undefined,
         items: lines.map((l) => ({ productId: l.productId, quantity: l.quantity, unitCost: l.unitCost.toFixed(2) })),
@@ -113,7 +113,7 @@ export function StockInScreen() {
               <Select value={supplierId} onValueChange={setSupplierId}>
                 <SelectTrigger><SelectValue placeholder="Pilih supplier (opsional)" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tanpa supplier</SelectItem>
+                  <SelectItem value="none">Tanpa supplier</SelectItem>
                   {suppliers.map((s) => <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>)}
                 </SelectContent>
               </Select>
