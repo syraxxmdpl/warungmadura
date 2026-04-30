@@ -1,5 +1,7 @@
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { user as userTable } from "@/db/schema/auth";
+import { createClient } from "@/lib/supabase-server";
 
 export type Role = "owner" | "cashier";
 
@@ -22,26 +24,33 @@ export class HttpError extends Error {
 }
 
 export async function getAuthContext(): Promise<AuthContext> {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    if (!session?.user) {
+    const supabase = await createClient();
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
         throw new HttpError(401, "Tidak terautentikasi");
     }
-    const u = session.user as typeof session.user & {
-        role?: string;
-        isActive?: boolean;
-    };
-    if (u.isActive === false) {
+
+    const [profile] = await db
+        .select()
+        .from(userTable)
+        .where(eq(userTable.id, session.user.id));
+
+    if (!profile) {
+        throw new HttpError(401, "Profil pengguna tidak ditemukan");
+    }
+    if (!profile.isActive) {
         throw new HttpError(403, "Akun dinonaktifkan");
     }
-    const role = (u.role as Role) ?? "cashier";
+
     return {
-        userId: u.id,
-        email: u.email,
-        name: u.name,
-        role,
-        isActive: u.isActive ?? true,
+        userId: profile.id,
+        email: profile.email,
+        name: profile.name,
+        role: profile.role as Role,
+        isActive: profile.isActive,
     };
 }
 
