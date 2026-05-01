@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
     Card, CardContent, CardDescription, CardHeader, CardTitle,
@@ -17,12 +17,102 @@ import {
     DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Minus, Plus, Search, ShoppingBag, Trash2 } from "lucide-react";
+import { FileText, Minus, Plus, Search, ShoppingBag, Trash2 } from "lucide-react";
 import { demoApi } from "@/lib/warung/demo-api";
 import type { Category, Product, PaymentMethod } from "@/lib/warung/api";
 import { formatRupiah } from "@/lib/warung/format";
 
 interface CartItem { product: Product; quantity: number }
+
+interface ReceiptData {
+    id: string;
+    total: number;
+    payment: PaymentMethod;
+    cashGiven: number;
+    createdAt: string;
+    items: CartItem[];
+}
+
+function printReceipt(receipt: ReceiptData) {
+    const paymentLabel = receipt.payment === "cash" ? "Tunai" : receipt.payment === "qris" ? "QRIS" : "Transfer";
+    const change = receipt.payment === "cash" && receipt.cashGiven > receipt.total
+        ? receipt.cashGiven - receipt.total
+        : 0;
+    const now = new Date(receipt.createdAt);
+    const dateStr = now.toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" });
+    const timeStr = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+    const itemRows = receipt.items.map((c) => `
+        <tr>
+            <td style="padding:2px 0;vertical-align:top">${c.product.name}</td>
+            <td style="padding:2px 4px;text-align:center;white-space:nowrap;vertical-align:top">${c.quantity}x</td>
+            <td style="padding:2px 0;text-align:right;white-space:nowrap;vertical-align:top">${formatRupiah(Number(c.product.sellingPrice) * c.quantity)}</td>
+        </tr>
+    `).join("");
+
+    const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<title>Struk #${receipt.id.slice(0, 8)}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    color: #000;
+    background: #fff;
+    width: 80mm;
+    padding: 8px 12px;
+  }
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+  .divider { border-top: 1px dashed #000; margin: 6px 0; }
+  table { width: 100%; border-collapse: collapse; }
+  .row-between { display: flex; justify-content: space-between; }
+  .total-row { font-size: 14px; font-weight: bold; }
+  .footer { margin-top: 8px; font-size: 11px; text-align: center; }
+  @media print {
+    html, body { width: 80mm; }
+    @page { margin: 0; size: 80mm auto; }
+  }
+</style>
+</head>
+<body>
+  <div class="center bold" style="font-size:14px;margin-bottom:2px">WARUNG MADURA</div>
+  <div class="center" style="font-size:11px">Sistem POS Digital</div>
+  <div class="divider"></div>
+  <div class="row-between"><span>No. Struk</span><span>#${receipt.id.slice(0, 8).toUpperCase()}</span></div>
+  <div class="row-between"><span>Tanggal</span><span>${dateStr}</span></div>
+  <div class="row-between"><span>Waktu</span><span>${timeStr}</span></div>
+  <div class="divider"></div>
+  <table>
+    ${itemRows}
+  </table>
+  <div class="divider"></div>
+  <div class="row-between"><span>Subtotal</span><span>${formatRupiah(receipt.total)}</span></div>
+  <div class="row-between total-row" style="margin-top:4px"><span>TOTAL</span><span>${formatRupiah(receipt.total)}</span></div>
+  <div class="divider"></div>
+  <div class="row-between"><span>Pembayaran</span><span>${paymentLabel}</span></div>
+  ${receipt.payment === "cash" && receipt.cashGiven > 0 ? `
+  <div class="row-between"><span>Uang Diterima</span><span>${formatRupiah(receipt.cashGiven)}</span></div>
+  <div class="row-between bold"><span>Kembalian</span><span>${formatRupiah(change)}</span></div>
+  ` : ""}
+  <div class="divider"></div>
+  <div class="footer">
+    <div>Terima kasih telah berbelanja!</div>
+    <div style="margin-top:2px;color:#555">[Mode Demo — tidak tersimpan]</div>
+  </div>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank", "width=400,height=600");
+    if (!win) { toast.error("Pop-up diblokir browser. Izinkan pop-up untuk mencetak struk."); return; }
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => { win.print(); win.close(); }, 400);
+}
 
 export function DemoPosScreen() {
     const [products, setProducts] = useState<Product[] | null>(null);
@@ -33,7 +123,8 @@ export function DemoPosScreen() {
     const [payment, setPayment] = useState<PaymentMethod>("cash");
     const [cashGiven, setCashGiven] = useState<number>(0);
     const [submitting, setSubmitting] = useState(false);
-    const [receipt, setReceipt] = useState<{ id: string; total: number; payment: PaymentMethod; cashGiven: number; createdAt: string } | null>(null);
+    const [receipt, setReceipt] = useState<ReceiptData | null>(null);
+    const lastCartRef = useRef<CartItem[]>([]);
 
     const load = useCallback(async () => {
         const [prods, cats] = await Promise.all([demoApi.products.list(), demoApi.categories.list()]);
@@ -90,12 +181,13 @@ export function DemoPosScreen() {
         if (cart.length === 0) { toast.error("Keranjang masih kosong"); return; }
         if (payment === "cash" && cashGiven < total) { toast.error("Uang tunai kurang dari total"); return; }
         setSubmitting(true);
+        lastCartRef.current = cart;
         try {
             const result = await demoApi.transactions.create({
                 items: cart.map((c) => ({ productId: c.product.id, quantity: c.quantity })),
                 paymentMethod: payment,
             });
-            setReceipt({ id: result.id, total, payment, cashGiven, createdAt: result.createdAt });
+            setReceipt({ id: result.id, total, payment, cashGiven, createdAt: result.createdAt, items: lastCartRef.current });
             toast.success(`[Demo] Transaksi sukses · ${formatRupiah(total)}`);
             setCart([]);
             setCashGiven(0);
@@ -254,18 +346,25 @@ export function DemoPosScreen() {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Transaksi Demo Berhasil ✓</DialogTitle>
-                        <DialogDescription>
-                            ID: #{receipt?.id.slice(0, 8)} · {formatRupiah(receipt?.total ?? 0)}
-                            {receipt?.payment === "cash" && receipt.cashGiven > 0 && (
-                                <span> · Kembalian {formatRupiah(receipt.cashGiven - (receipt.total ?? 0))}</span>
-                            )}
-                            <br />
-                            <span className="text-amber-600 dark:text-amber-400 text-xs">
-                                Ini adalah simulasi demo — tidak tersimpan di database.
-                            </span>
+                        <DialogDescription asChild>
+                            <div className="space-y-1">
+                                <p>
+                                    ID: #{receipt?.id.slice(0, 8)} · {formatRupiah(receipt?.total ?? 0)}
+                                    {receipt?.payment === "cash" && receipt.cashGiven > 0 && (
+                                        <span> · Kembalian {formatRupiah(receipt.cashGiven - (receipt.total ?? 0))}</span>
+                                    )}
+                                </p>
+                                <p className="text-amber-600 dark:text-amber-400 text-xs">
+                                    Ini adalah simulasi demo — tidak tersimpan di database.
+                                </p>
+                            </div>
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter>
+                    <DialogFooter className="flex gap-2 sm:gap-2">
+                        <Button variant="outline" className="flex items-center gap-2" onClick={() => receipt && printReceipt(receipt)}>
+                            <FileText className="h-4 w-4" />
+                            Cetak Struk PDF
+                        </Button>
                         <Button onClick={() => setReceipt(null)}>Tutup</Button>
                     </DialogFooter>
                 </DialogContent>
