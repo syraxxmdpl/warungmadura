@@ -41,9 +41,8 @@ const navMain = [
 ]
 
 const navSecondary = [
-  { title: "Pengaturan", url: "#", icon: IconSettings },
-  { title: "Bantuan", url: "#", icon: IconHelp },
-  { title: "Cari", url: "#", icon: IconSearch },
+  { title: "Pengaturan", url: "/settings", icon: IconSettings },
+  { title: "Bantuan", url: "/help", icon: IconHelp },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

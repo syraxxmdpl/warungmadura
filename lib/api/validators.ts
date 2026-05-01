@@ -102,3 +102,16 @@ export type StockInCreate = z.infer<typeof stockInCreateSchema>;
 export type UserCreate = z.infer<typeof userCreateSchema>;
 export type UserUpdate = z.infer<typeof userUpdateSchema>;
 export type ReportFilter = z.infer<typeof reportFilterSchema>;
+
+export const profileUpdateSchema = z.object({
+    name: z.string().min(2).max(100),
+});
+
+export const passwordUpdateSchema = z.object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(8).max(128),
+});
+
+export type ProfileUpdate = z.infer<typeof profileUpdateSchema>;
+export type PasswordUpdate = z.infer<typeof passwordUpdateSchema>;
+

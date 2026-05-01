@@ -110,6 +110,29 @@ export const api = {
             return request<SalesReport>(`/api/reports/sales${q.size ? `?${q}` : ""}`);
         },
     },
+
+    // ── Settings ───────────────────────────────────────────────────────────
+    settings: {
+        getProfile: () => request<AppUser>("/api/settings/profile"),
+        updateProfile: (body: { name: string }) => request<AppUser>("/api/settings/profile", { method: "PUT", body: JSON.stringify(body) }),
+        updatePassword: (body: { currentPassword: string; newPassword: string }) =>
+            request<{ message: string }>("/api/settings/password", { method: "PUT", body: JSON.stringify(body) }),
+    },
+
+    // ── Account ────────────────────────────────────────────────────────────
+    account: {
+        get: () => request<AccountInfo>("/api/account"),
+    },
+
+    // ── Billing ────────────────────────────────────────────────────────────
+    billing: {
+        get: () => request<BillingInfo>("/api/billing"),
+    },
+
+    // ── Notifications ──────────────────────────────────────────────────────
+    notifications: {
+        list: () => request<{ notifications: AppNotification[]; unreadCount: number }>("/api/notifications"),
+    },
 };
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -195,3 +218,28 @@ export type SalesReport = {
     categoryBreakdown: { categoryId: number | null; categoryName: string | null; qty: string | null; revenue: string | null; cost: string | null }[];
     transactions: (Transaction & { cashierName: string | null })[];
 };
+
+export type AccountInfo = {
+    id: string; name: string; email: string;
+    role: "owner" | "cashier"; isActive: boolean; createdAt: string;
+};
+
+export type BillingInfo = {
+    plan: string;
+    planLabel: string;
+    stats: { totalProducts: number; transactionsThisMonth: number; activeUsers: number; };
+    limits: { maxProducts: number | null; maxUsers: number | null; maxTransactions: number | null; };
+    features: { name: string; included: boolean; }[];
+};
+
+export type AppNotification = {
+    id: string;
+    type: "warning" | "info" | "success";
+    title: string;
+    description: string;
+    createdAt: string;
+    read: boolean;
+};
+
+
+
