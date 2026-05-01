@@ -129,6 +129,14 @@ export default function Home() {
                     <Wallet className="w-3.5 h-3.5" /> Multi-payment
                   </Badge>
                 </div>
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <Button asChild size="lg">
+                    <Link href="/demo/dashboard">Lihat Dashboard Demo</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <Link href="/demo/pos">Buka Halaman POS</Link>
+                  </Button>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Card className="p-4">
@@ -154,14 +162,7 @@ export default function Home() {
                 </Card>
               </div>
             </div>
-            <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Button asChild size="lg">
-                <Link href="/demo/dashboard">Lihat Dashboard Demo</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/demo/pos">Buka Halaman POS</Link>
-              </Button>
-            </div>
+
           </Card>
         </section>
       </main>
