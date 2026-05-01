@@ -1,7 +1,6 @@
 # API Reference — Warung Madura
 
-> **Swagger UI**: jalankan dev server lalu buka [`/api-docs`](http://localhost:3000/api-docs).
-> Spesifikasi OpenAPI 3.0 mentah tersedia di [`/api/docs`](http://localhost:3000/api/docs).
+
 
 Semua endpoint mengembalikan JSON dengan envelope:
 
