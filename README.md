@@ -212,6 +212,124 @@ warungpintar-1.0/
 └── prd_warung_madura.md           # Product Requirements Document
 ```
 
+## Diagram Arsitektur
+
+```mermaid
+flowchart TB
+    subgraph Klien["Lapisan Klien (Browser)"]
+        direction LR
+        LP["Halaman Utama<br/>Landing Page"]
+        Auth["Halaman Masuk / Daftar"]
+        Demo["Halaman Demo<br/>tanpa autentikasi"]
+        subgraph AppShell["Antarmuka Aplikasi"]
+            Sidebar["Sidebar Navigasi"]
+            Header["Header Halaman"]
+            Pages["Komponen Halaman<br/>Dashboard, POS, Produk,<br/>Stok Masuk, Transaksi,<br/>Laporan, Pengguna, Pengaturan"]
+        end
+        ClientAPI["Klien API<br/>lib/warung/api.ts<br/>fetch dengan cookie sesi"]
+    end
+
+    subgraph Server["Lapisan Server (Next.js 15 App Router)"]
+        direction TB
+        MW["Middleware<br/>middleware.ts<br/>Validasi sesi untuk rute terlindungi"]
+
+        subgraph APIRoutes["API Route Handlers (app/api/)"]
+            direction LR
+            R1["products"]
+            R2["transactions"]
+            R3["stock-ins"]
+            R4["categories"]
+            R5["suppliers"]
+            R6["stock-movements"]
+            R7["reports"]
+            R8["users"]
+            R9["settings"]
+            R10["notifications"]
+        end
+
+        subgraph APILayer["Utilitas API (lib/api/)"]
+            direction LR
+            AG["Auth Guard<br/>getAuthContext()<br/>requireRole()"]
+            Val["Validator Zod<br/>Validasi request body"]
+            Res["Response Helper<br/>ok / created / fail<br/>handleError"]
+        end
+
+        subgraph Services["Lapisan Layanan Bisnis (lib/services/)"]
+            direction LR
+            S1["ProductService"]
+            S2["TransactionService"]
+            S3["StockInService"]
+            S4["CategoryService"]
+            S5["SupplierService"]
+            S6["StockMovementService"]
+            S7["ReportService"]
+            S8["UserService"]
+        end
+
+        subgraph ORM["Lapisan Akses Data"]
+            direction LR
+            Drizzle["Drizzle ORM<br/>db/index.ts<br/>node-postgres"]
+            Schema["Skema Database<br/>db/schema/warung.ts<br/>db/schema/auth.ts"]
+        end
+    end
+
+    subgraph Eksternal["Layanan Eksternal"]
+        direction LR
+        SBAuth["Supabase Auth<br/>Autentikasi email/password<br/>Manajemen sesi"]
+        SBDB["Supabase PostgreSQL<br/>Database cloud<br/>9 tabel relasional"]
+    end
+
+    %% Alur Klien ke Server
+    Pages --> ClientAPI
+    ClientAPI -->|"HTTP Request<br/>dengan cookie"| MW
+    Auth -->|"Autentikasi"| SBAuth
+    LP --> Auth
+    LP --> Demo
+
+    %% Alur Server
+    MW -->|"Sesi valid"| APIRoutes
+    MW -->|"Tanpa sesi"| Auth
+
+    APIRoutes --> AG
+    APIRoutes --> Val
+    APIRoutes --> Res
+    AG -->|"Verifikasi sesi"| SBAuth
+    AG -->|"Query profil pengguna"| Drizzle
+
+    APIRoutes --> Services
+    Services --> Drizzle
+    Drizzle --> Schema
+    Schema -->|"Query SQL"| SBDB
+    SBAuth -->|"Simpan data auth"| SBDB
+
+    %% Alur Demo (bypass middleware)
+    Demo -.->|"Data contoh lokal<br/>tanpa API"| Pages
+
+    %% Styling
+    classDef clientLayer fill:#3b82f6,stroke:#2563eb,color:#fff
+    classDef serverLayer fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef serviceLayer fill:#f59e0b,stroke:#d97706,color:#000
+    classDef dataLayer fill:#10b981,stroke:#059669,color:#fff
+    classDef externalLayer fill:#ef4444,stroke:#dc2626,color:#fff
+
+    class LP,Auth,Demo,Sidebar,Header,Pages,ClientAPI clientLayer
+    class MW,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,AG,Val,Res serverLayer
+    class S1,S2,S3,S4,S5,S6,S7,S8 serviceLayer
+    class Drizzle,Schema dataLayer
+    class SBAuth,SBDB externalLayer
+```
+
+### Penjelasan Lapisan
+
+| Lapisan | Teknologi | Deskripsi |
+|---------|-----------|-----------|
+| **Klien** | React, shadcn/ui, Recharts, Tailwind CSS | Komponen antarmuka dengan navigasi sidebar, tema gelap/terang, dan klien API terpusat |
+| **Middleware** | Next.js Middleware, Supabase SSR | Memvalidasi cookie sesi pada setiap request ke rute terlindungi, redirect ke halaman masuk jika tidak valid |
+| **API Routes** | Next.js App Router (Route Handlers) | 10 grup endpoint RESTful yang menangani request HTTP, validasi input dengan Zod, dan proteksi peran |
+| **Layanan Bisnis** | TypeScript Service Classes | 8 kelas layanan yang mengenkapsulasi logika bisnis: transaksi database, validasi stok, kalkulasi keuangan |
+| **Akses Data** | Drizzle ORM, node-postgres | Query builder type-safe dengan skema deklaratif, koneksi ke PostgreSQL melalui connection string |
+| **Eksternal** | Supabase Auth, Supabase PostgreSQL | Autentikasi email/password terkelola dan database PostgreSQL cloud dengan 9 tabel relasional |
+
 ## Database Schema
 
 The application uses a relational schema with the following core tables:
@@ -227,6 +345,115 @@ The application uses a relational schema with the following core tables:
 | **stock_ins** | Incoming stock headers from suppliers |
 | **stock_in_items** | Line items per stock-in entry |
 | **stock_movements** | Audit log for all stock changes (IN/OUT) |
+
+```mermaid
+erDiagram
+    users {
+        text id PK
+        text name
+        text email UK
+        boolean email_verified
+        text image
+        text role "owner | cashier"
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    categories {
+        serial id PK
+        text name UK
+        text description
+        timestamp created_at
+    }
+
+    products {
+        serial id PK
+        text sku UK
+        text name
+        integer category_id FK
+        numeric purchase_price "precision 12,2"
+        numeric selling_price "precision 12,2"
+        text unit "default: pcs"
+        integer current_stock
+        integer min_stock
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    suppliers {
+        serial id PK
+        text name
+        text phone
+        text address
+        timestamp created_at
+    }
+
+    transactions {
+        uuid id PK
+        text user_id FK
+        numeric total_amount "precision 14,2"
+        numeric total_cost "precision 14,2"
+        text payment_method "cash | qris | transfer"
+        text status "completed | refunded"
+        timestamp created_at
+    }
+
+    transaction_items {
+        serial id PK
+        uuid transaction_id FK
+        integer product_id FK
+        integer quantity
+        numeric unit_price "precision 12,2"
+        numeric unit_cost "precision 12,2"
+        numeric subtotal "precision 14,2"
+    }
+
+    stock_ins {
+        uuid id PK
+        text user_id FK
+        integer supplier_id FK
+        numeric total_cost "precision 14,2"
+        date received_date
+        text notes
+        timestamp created_at
+    }
+
+    stock_in_items {
+        serial id PK
+        uuid stock_in_id FK
+        integer product_id FK
+        integer quantity
+        numeric unit_cost "precision 12,2"
+    }
+
+    stock_movements {
+        serial id PK
+        integer product_id FK
+        text type "in | out"
+        integer quantity
+        text reference_type "transaction | stock_in | refund"
+        uuid reference_id
+        text notes
+        text user_id FK
+        timestamp created_at
+    }
+
+    users ||--o{ transactions : "mencatat"
+    users ||--o{ stock_ins : "mencatat"
+    users ||--o{ stock_movements : "melakukan"
+
+    categories ||--o{ products : "memiliki"
+
+    products ||--o{ transaction_items : "dijual di"
+    products ||--o{ stock_in_items : "diterima di"
+    products ||--o{ stock_movements : "dicatat di"
+
+    suppliers ||--o{ stock_ins : "memasok"
+
+    transactions ||--|{ transaction_items : "berisi"
+    stock_ins ||--|{ stock_in_items : "berisi"
+```
 
 ## User Roles
 
