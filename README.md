@@ -241,6 +241,96 @@ The application uses a relational schema with the following core tables:
 | User Management | ✅ | ❌ |
 | Settings | ✅ | ✅ |
 
+## User Flow
+
+```mermaid
+flowchart TD
+    Start([🌐 User visits site]) --> Landing[📄 Landing Page<br/><i>/</i>]
+
+    Landing --> SignIn[🔑 Sign In<br/><i>/sign-in</i>]
+    Landing --> SignUp[📝 Sign Up<br/><i>/sign-up</i>]
+    Landing --> Demo[🎮 Demo Mode]
+
+    %% Authentication Flow
+    SignIn -->|Email + Password| AuthCheck{🔐 Supabase Auth<br/>Session Valid?}
+    SignUp -->|Create Account| AuthCheck
+
+    AuthCheck -->|❌ Failed| SignIn
+    AuthCheck -->|✅ Success| Middleware{🛡️ Middleware<br/>Route Protection}
+
+    %% Middleware checks
+    Middleware -->|Session Valid| RoleCheck{👤 Role Check}
+    Middleware -->|No Session| RedirectSignIn[↩️ Redirect to<br/>Sign In]
+    RedirectSignIn --> SignIn
+
+    %% Role-based access
+    RoleCheck -->|owner| OwnerDash[📊 Dashboard<br/><i>Full KPIs, trends, alerts</i>]
+    RoleCheck -->|cashier| CashierDash[📊 Dashboard<br/><i>Limited view</i>]
+
+    %% Owner navigation
+    OwnerDash --> POS[🛒 POS Kasir<br/><i>/pos</i>]
+    OwnerDash --> Products[📦 Produk<br/><i>/products</i>]
+    OwnerDash --> StockIn[📥 Stok Masuk<br/><i>/stock-in</i>]
+    OwnerDash --> Transactions[💰 Transaksi<br/><i>/transactions</i>]
+    OwnerDash --> Reports[📈 Laporan<br/><i>/reports — owner only</i>]
+    OwnerDash --> Users[👥 Pengguna<br/><i>/users — owner only</i>]
+    OwnerDash --> Settings[⚙️ Pengaturan<br/><i>/settings</i>]
+
+    %% Cashier navigation (limited)
+    CashierDash --> POS
+    CashierDash --> StockIn
+    CashierDash --> Transactions
+    CashierDash --> Settings
+
+    %% POS sub-flow
+    POS -->|Add items to cart| ProcessSale[💳 Process Sale<br/><i>Cash / QRIS / Transfer</i>]
+    ProcessSale -->|Auto stock deduction| Transactions
+
+    %% Stock-In sub-flow
+    StockIn -->|Record from supplier| StockUpdate[📦 Stock Updated<br/><i>+ movement log</i>]
+
+    %% Products sub-flow (owner)
+    Products -->|CRUD operations| ProductMgmt[🏷️ Manage SKU, Price,<br/>Categories, Min Stock]
+
+    %% Reports sub-flow (owner)
+    Reports --> ExportReport[📄 Export<br/><i>CSV / PDF</i>]
+
+    %% User Management sub-flow (owner)
+    Users --> ManageUsers[👤 Add/Edit Users<br/><i>Assign owner/cashier role</i>]
+
+    %% Demo flow (no auth required)
+    Demo --> DemoDash[📊 Demo Dashboard<br/><i>/demo/dashboard</i>]
+    Demo --> DemoPOS[🛒 Demo POS<br/><i>/demo/pos</i>]
+
+    %% Logout
+    Settings --> Logout[🚪 Sign Out]
+    Logout --> Landing
+
+    %% Styling
+    classDef authNode fill:#fbbf24,stroke:#d97706,color:#000
+    classDef ownerNode fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef sharedNode fill:#3b82f6,stroke:#2563eb,color:#fff
+    classDef demoNode fill:#10b981,stroke:#059669,color:#fff
+    classDef dangerNode fill:#ef4444,stroke:#dc2626,color:#fff
+
+    class SignIn,SignUp,AuthCheck authNode
+    class Reports,Users,ManageUsers,ExportReport,ProductMgmt ownerNode
+    class POS,StockIn,Transactions,ProcessSale,StockUpdate,Settings sharedNode
+    class Demo,DemoDash,DemoPOS demoNode
+    class RedirectSignIn dangerNode
+```
+
+### Flow Summary
+
+| Path | Description |
+|------|-------------|
+| **Sign Up → Dashboard** | New user registers → Supabase creates session → middleware validates → redirected to `/dashboard` |
+| **Sign In → Dashboard** | Existing user authenticates → session cookie set → middleware passes → role-based dashboard |
+| **Owner Flow** | Full access: Dashboard, POS, Products (CRUD), Stock-In, Transactions, Reports, Users, Settings |
+| **Cashier Flow** | Limited access: Dashboard (limited), POS, Stock-In, Transactions, Settings |
+| **Demo Flow** | No authentication required — public `/demo/dashboard` and `/demo/pos` with mock data |
+| **Protected Route** | Unauthenticated access to any protected route → middleware redirects to `/sign-in?redirect=...` |
+
 ## Development Commands
 
 ### Application
