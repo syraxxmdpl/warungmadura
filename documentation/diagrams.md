@@ -1,4 +1,4 @@
-﻿# Diagram Teknis — Warung Madura
+# Diagram Teknis — Warung Madura
 
 Dokumen ini berisi diagram teknis lengkap dari aplikasi Warung Madura.
 Untuk dokumentasi utama, lihat [README.md](../README.md).
@@ -374,11 +374,11 @@ flowchart TD
 
 | Warna | Akses |
 |-------|-------|
-| Hijau | Halaman publik â€” dapat diakses tanpa login |
-| Teal | Halaman demo â€” data contoh tanpa autentikasi |
-| Biru | Halaman aplikasi â€” pemilik dan kasir |
-| Ungu | Halaman khusus pemilik â€” produk, laporan, pengguna |
-| Kuning | Endpoint API â€” diakses oleh klien melalui HTTP |
+| Hijau | Halaman publik — dapat diakses tanpa login |
+| Teal | Halaman demo — data contoh tanpa autentikasi |
+| Biru | Halaman aplikasi — pemilik dan kasir |
+| Ungu | Halaman khusus pemilik — produk, laporan, pengguna |
+| Kuning | Endpoint API — diakses oleh klien melalui HTTP |
 
 ## Wireframe Antarmuka
 
@@ -725,7 +725,7 @@ flowchart TD
 | **Masuk ke Dashboard** | Pengguna login, cookie sesi diatur, middleware melewatkan, dashboard sesuai peran |
 | **Alur Pemilik** | Akses penuh: Dashboard, POS, Produk (CRUD), Stok Masuk, Transaksi, Laporan, Pengguna, Pengaturan |
 | **Alur Kasir** | Akses terbatas: Dashboard (terbatas), POS, Stok Masuk, Transaksi, Pengaturan |
-| **Alur Demo** | Tanpa autentikasi â€” halaman publik `/demo/dashboard` dan `/demo/pos` dengan data contoh |
+| **Alur Demo** | Tanpa autentikasi — halaman publik `/demo/dashboard` dan `/demo/pos` dengan data contoh |
 | **Rute Terlindungi** | Akses tanpa login ke rute terlindungi akan dialihkan ke `/sign-in?redirect=...` |
 
 ### Use Case Diagram

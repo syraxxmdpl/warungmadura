@@ -1,25 +1,25 @@
-# Warung Madura â€” Sistem Informasi Persediaan & POS
+# Warung Madura — Sistem Informasi Persediaan & POS
 
 A web-based inventory management and Point-of-Sale (POS) system built for **Warung Madura** (Indonesian convenience stores). The application enables store owners to monitor sales, stock levels, and financial reports in real-time from any device, while cashiers can efficiently process transactions and record incoming stock.
 
 ## Features
 
-- ðŸ“Š **Real-Time Dashboard** â€” Live sales summary, transaction count, top products, sales trend chart (7-day), and low-stock alerts
-- ðŸ›’ **Point of Sale (POS)** â€” Fast cashier interface for processing sales with multi-payment support (Cash, QRIS, Transfer) and automatic stock deduction
-- ðŸ“¦ **Product Management** â€” Full CRUD for products with SKU, categories, purchase/selling price, stock levels, and minimum stock thresholds
-- ðŸ“¥ **Stock-In (Restock)** â€” Record incoming inventory from suppliers with automatic stock increment and movement logging
-- ðŸ’° **Transactions** â€” Complete transaction history with item details and status tracking
-- ðŸ“ˆ **Financial Reports** â€” Daily, weekly, and monthly reports with revenue, cost (HPP), and gross profit calculations; export to CSV/PDF
-- ðŸ‘¥ **User & Role Management** â€” Multi-user with `owner` (full access) and `cashier` (limited to POS & stock-in) roles
-- ðŸ”’ **Authentication** â€” Supabase Auth with email/password, session-based middleware protection
-- ðŸŒ™ **Dark Mode** â€” System preference detection with manual toggle
-- ðŸ“± **Responsive Design** â€” Mobile-first, optimized for smartphones, tablets, and desktops
-- ðŸŽ® **Demo Mode** â€” Public demo dashboard and POS pages (no login required)
+- 📊 **Real-Time Dashboard** — Live sales summary, transaction count, top products, sales trend chart (7-day), and low-stock alerts
+- 🛒 **Point of Sale (POS)** — Fast cashier interface for processing sales with multi-payment support (Cash, QRIS, Transfer) and automatic stock deduction
+- 📦 **Product Management** — Full CRUD for products with SKU, categories, purchase/selling price, stock levels, and minimum stock thresholds
+- 📥 **Stock-In (Restock)** — Record incoming inventory from suppliers with automatic stock increment and movement logging
+- 💰 **Transactions** — Complete transaction history with item details and status tracking
+- 📈 **Financial Reports** — Daily, weekly, and monthly reports with revenue, cost (HPP), and gross profit calculations; export to CSV/PDF
+- 👥 **User & Role Management** — Multi-user with `owner` (full access) and `cashier` (limited to POS & stock-in) roles
+- 🔒 **Authentication** — Supabase Auth with email/password, session-based middleware protection
+- 🌙 **Dark Mode** — System preference detection with manual toggle
+- 📱 **Responsive Design** — Mobile-first, optimized for smartphones, tablets, and desktops
+- 🎮 **Demo Mode** — Public demo dashboard and POS pages (no login required)
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
+|-------|------------|
 | **Framework** | [Next.js 15](https://nextjs.org/) (App Router, Turbopack) |
 | **Language** | TypeScript |
 | **Authentication** | [Supabase Auth](https://supabase.com/docs/guides/auth) (email/password) |
@@ -37,7 +37,7 @@ A web-based inventory management and Point-of-Sale (POS) system built for **Waru
 ## Prerequisites
 
 - **Node.js** 18+ installed
-- A **Supabase** project (free tier works) â€” [create one here](https://supabase.com/dashboard)
+- A **Supabase** project (free tier works) — [create one here](https://supabase.com/dashboard)
 - (Optional) Docker & Docker Compose for local PostgreSQL
 
 ## Getting Started
@@ -104,112 +104,112 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 
 ```
 warungpintar-1.0/
-â”œâ”€â”€ app/                           # Next.js App Router
-â”‚   â”œâ”€â”€ (app)/                     # Authenticated app routes (sidebar layout)
-â”‚   â”‚   â”œâ”€â”€ dashboard/             # Real-time dashboard
-â”‚   â”‚   â”œâ”€â”€ pos/                   # Point of Sale (cashier)
-â”‚   â”‚   â”œâ”€â”€ products/              # Product management
-â”‚   â”‚   â”œâ”€â”€ stock-in/              # Stock-in / restock
-â”‚   â”‚   â”œâ”€â”€ transactions/          # Transaction history
-â”‚   â”‚   â”œâ”€â”€ reports/               # Financial reports (owner only)
-â”‚   â”‚   â”œâ”€â”€ users/                 # User management (owner only)
-â”‚   â”‚   â”œâ”€â”€ settings/              # App settings
-â”‚   â”‚   â”œâ”€â”€ account/               # User account
-â”‚   â”‚   â”œâ”€â”€ billing/               # Billing info
-â”‚   â”‚   â”œâ”€â”€ notifications/         # Notifications
-â”‚   â”‚   â””â”€â”€ help/                  # Help & support
-â”‚   â”œâ”€â”€ api/                       # API route handlers
-â”‚   â”‚   â”œâ”€â”€ auth/                  # Authentication endpoints
-â”‚   â”‚   â”œâ”€â”€ products/              # Product CRUD API
-â”‚   â”‚   â”œâ”€â”€ categories/            # Category API
-â”‚   â”‚   â”œâ”€â”€ suppliers/             # Supplier API
-â”‚   â”‚   â”œâ”€â”€ transactions/          # Transaction API
-â”‚   â”‚   â”œâ”€â”€ stock-ins/             # Stock-in API
-â”‚   â”‚   â”œâ”€â”€ stock-movements/       # Stock movement log API
-â”‚   â”‚   â”œâ”€â”€ reports/               # Report generation API
-â”‚   â”‚   â”œâ”€â”€ users/                 # User management API
-â”‚   â”‚   â”œâ”€â”€ account/               # Account API
-â”‚   â”‚   â”œâ”€â”€ billing/               # Billing API
-â”‚   â”‚   â”œâ”€â”€ notifications/         # Notifications API
-â”‚   â”‚   â”œâ”€â”€ settings/              # Settings API
-â”‚   â”‚   â””â”€â”€ demo/                  # Demo data API
-â”‚   â”œâ”€â”€ auth/callback/             # Supabase auth callback
-â”‚   â”œâ”€â”€ demo/                      # Public demo pages (no auth)
-â”‚   â”œâ”€â”€ sign-in/                   # Sign-in page
-â”‚   â”œâ”€â”€ sign-up/                   # Sign-up page
-â”‚   â”œâ”€â”€ page.tsx                   # Landing page
-â”‚   â”œâ”€â”€ layout.tsx                 # Root layout
-â”‚   â””â”€â”€ globals.css                # Global styles
-â”œâ”€â”€ components/
-â”‚   â”œâ”€â”€ warung/                    # Feature-specific components
-â”‚   â”‚   â”œâ”€â”€ dashboard-client.tsx   # Dashboard real-time client
-â”‚   â”‚   â”œâ”€â”€ dashboard-kpis.tsx     # KPI summary cards
-â”‚   â”‚   â”œâ”€â”€ sales-trend-chart.tsx  # 7-day sales trend chart
-â”‚   â”‚   â”œâ”€â”€ live-transactions.tsx  # Live transaction feed
-â”‚   â”‚   â”œâ”€â”€ low-stock-panel.tsx    # Low-stock alert panel
-â”‚   â”‚   â”œâ”€â”€ top-products.tsx       # Top-selling products
-â”‚   â”‚   â”œâ”€â”€ pos-screen.tsx         # POS cashier interface
-â”‚   â”‚   â”œâ”€â”€ products-table.tsx     # Products data table
-â”‚   â”‚   â”œâ”€â”€ stock-in-screen.tsx    # Stock-in form
-â”‚   â”‚   â”œâ”€â”€ transactions-screen.tsx# Transaction history
-â”‚   â”‚   â”œâ”€â”€ reports-screen.tsx     # Financial reports
-â”‚   â”‚   â”œâ”€â”€ users-screen.tsx       # User management
-â”‚   â”‚   â”œâ”€â”€ settings-screen.tsx    # Settings panel
-â”‚   â”‚   â”œâ”€â”€ account-screen.tsx     # Account settings
-â”‚   â”‚   â”œâ”€â”€ billing-screen.tsx     # Billing details
-â”‚   â”‚   â”œâ”€â”€ notifications-screen.tsx # Notifications
-â”‚   â”‚   â”œâ”€â”€ help-screen.tsx        # Help & support
-â”‚   â”‚   â”œâ”€â”€ demo-dashboard-client.tsx # Demo dashboard
-â”‚   â”‚   â”œâ”€â”€ demo-pos-screen.tsx    # Demo POS
-â”‚   â”‚   â””â”€â”€ demo-sidebar.tsx       # Demo sidebar
-â”‚   â”œâ”€â”€ ui/                        # shadcn/ui components (46+)
-â”‚   â”œâ”€â”€ app-sidebar.tsx            # Main sidebar navigation
-â”‚   â”œâ”€â”€ nav-main.tsx               # Primary nav items
-â”‚   â”œâ”€â”€ nav-secondary.tsx          # Secondary nav items
-â”‚   â”œâ”€â”€ nav-user.tsx               # User profile nav
-â”‚   â”œâ”€â”€ site-header.tsx            # Page header
-â”‚   â”œâ”€â”€ auth-buttons.tsx           # Auth action buttons
-â”‚   â”œâ”€â”€ theme-provider.tsx         # Theme context provider
-â”‚   â””â”€â”€ theme-toggle.tsx           # Dark/light mode toggle
-â”œâ”€â”€ db/
-â”‚   â”œâ”€â”€ index.ts                   # Database connection (Drizzle + pg)
-â”‚   â””â”€â”€ schema/
-â”‚       â”œâ”€â”€ auth.ts                # Auth schema (users, sessions)
-â”‚       â””â”€â”€ warung.ts              # Business schema (products, transactions, etc.)
-â”œâ”€â”€ lib/
-â”‚   â”œâ”€â”€ api/                       # API utilities
-â”‚   â”‚   â”œâ”€â”€ auth-guard.ts          # Role-based route protection
-â”‚   â”‚   â”œâ”€â”€ client.ts              # API client helpers
-â”‚   â”‚   â”œâ”€â”€ responses.ts           # Standardized API responses
-â”‚   â”‚   â””â”€â”€ validators.ts          # Zod request validators
-â”‚   â”œâ”€â”€ services/                  # Business logic layer
-â”‚   â”‚   â”œâ”€â”€ product.service.ts     # Product CRUD operations
-â”‚   â”‚   â”œâ”€â”€ category.service.ts    # Category management
-â”‚   â”‚   â”œâ”€â”€ supplier.service.ts    # Supplier management
-â”‚   â”‚   â”œâ”€â”€ transaction.service.ts # Transaction processing
-â”‚   â”‚   â”œâ”€â”€ stock-in.service.ts    # Stock-in processing
-â”‚   â”‚   â”œâ”€â”€ stock-movement.service.ts # Movement log queries
-â”‚   â”‚   â”œâ”€â”€ report.service.ts      # Report generation
-â”‚   â”‚   â””â”€â”€ user.service.ts        # User management
-â”‚   â”œâ”€â”€ warung/                    # Frontend utilities
-â”‚   â”‚   â”œâ”€â”€ api.ts                 # Client-side API calls
-â”‚   â”‚   â”œâ”€â”€ types.ts               # TypeScript interfaces
-â”‚   â”‚   â”œâ”€â”€ format.ts              # Currency/date formatting
-â”‚   â”‚   â”œâ”€â”€ export.ts              # CSV/PDF export helpers
-â”‚   â”‚   â”œâ”€â”€ mock-data.ts           # Demo mock data
-â”‚   â”‚   â””â”€â”€ demo-api.ts            # Demo API adapter
-â”‚   â”œâ”€â”€ auth-client.ts             # Supabase auth client hooks
-â”‚   â”œâ”€â”€ supabase.ts                # Browser Supabase client
-â”‚   â”œâ”€â”€ supabase-server.ts         # Server-side Supabase client
-â”‚   â””â”€â”€ utils.ts                   # General utilities (cn)
-â”œâ”€â”€ scripts/
-â”‚   â””â”€â”€ seed.ts                    # Database seeding script
-â”œâ”€â”€ drizzle/                       # Drizzle migration files
-â”œâ”€â”€ middleware.ts                   # Auth middleware (route protection)
-â”œâ”€â”€ drizzle.config.ts              # Drizzle ORM configuration
-â”œâ”€â”€ docker-compose.yaml            # Docker services (PostgreSQL)
-â”œâ”€â”€ Dockerfile                     # Application container
-â””â”€â”€ prd_warung_madura.md           # Product Requirements Document
+├── app/                           # Next.js App Router
+│   ├── (app)/                     # Authenticated app routes (sidebar layout)
+│   │   ├── dashboard/             # Real-time dashboard
+│   │   ├── pos/                   # Point of Sale (cashier)
+│   │   ├── products/              # Product management
+│   │   ├── stock-in/              # Stock-in / restock
+│   │   ├── transactions/          # Transaction history
+│   │   ├── reports/               # Financial reports (owner only)
+│   │   ├── users/                 # User management (owner only)
+│   │   ├── settings/              # App settings
+│   │   ├── account/               # User account
+│   │   ├── billing/               # Billing info
+│   │   ├── notifications/         # Notifications
+│   │   └── help/                  # Help & support
+│   ├── api/                       # API route handlers
+│   │   ├── auth/                  # Authentication endpoints
+│   │   ├── products/              # Product CRUD API
+│   │   ├── categories/            # Category API
+│   │   ├── suppliers/             # Supplier API
+│   │   ├── transactions/          # Transaction API
+│   │   ├── stock-ins/             # Stock-in API
+│   │   ├── stock-movements/       # Stock movement log API
+│   │   ├── reports/               # Report generation API
+│   │   ├── users/                 # User management API
+│   │   ├── account/               # Account API
+│   │   ├── billing/               # Billing API
+│   │   ├── notifications/         # Notifications API
+│   │   ├── settings/              # Settings API
+│   │   └── demo/                  # Demo data API
+│   ├── auth/callback/             # Supabase auth callback
+│   ├── demo/                      # Public demo pages (no auth)
+│   ├── sign-in/                   # Sign-in page
+│   ├── sign-up/                   # Sign-up page
+│   ├── page.tsx                   # Landing page
+│   ├── layout.tsx                 # Root layout
+│   └── globals.css                # Global styles
+├── components/
+│   ├── warung/                    # Feature-specific components
+│   │   ├── dashboard-client.tsx   # Dashboard real-time client
+│   │   ├── dashboard-kpis.tsx     # KPI summary cards
+│   │   ├── sales-trend-chart.tsx  # 7-day sales trend chart
+│   │   ├── live-transactions.tsx  # Live transaction feed
+│   │   ├── low-stock-panel.tsx    # Low-stock alert panel
+│   │   ├── top-products.tsx       # Top-selling products
+│   │   ├── pos-screen.tsx         # POS cashier interface
+│   │   ├── products-table.tsx     # Products data table
+│   │   ├── stock-in-screen.tsx    # Stock-in form
+│   │   ├── transactions-screen.tsx# Transaction history
+│   │   ├── reports-screen.tsx     # Financial reports
+│   │   ├── users-screen.tsx       # User management
+│   │   ├── settings-screen.tsx    # Settings panel
+│   │   ├── account-screen.tsx     # Account settings
+│   │   ├── billing-screen.tsx     # Billing details
+│   │   ├── notifications-screen.tsx # Notifications
+│   │   ├── help-screen.tsx        # Help & support
+│   │   ├── demo-dashboard-client.tsx # Demo dashboard
+│   │   ├── demo-pos-screen.tsx    # Demo POS
+│   │   └── demo-sidebar.tsx       # Demo sidebar
+│   ├── ui/                        # shadcn/ui components (46+)
+│   ├── app-sidebar.tsx            # Main sidebar navigation
+│   ├── nav-main.tsx               # Primary nav items
+│   ├── nav-secondary.tsx          # Secondary nav items
+│   ├── nav-user.tsx               # User profile nav
+│   ├── site-header.tsx            # Page header
+│   ├── auth-buttons.tsx           # Auth action buttons
+│   ├── theme-provider.tsx         # Theme context provider
+│   └── theme-toggle.tsx           # Dark/light mode toggle
+├── db/
+│   ├── index.ts                   # Database connection (Drizzle + pg)
+│   └── schema/
+│       ├── auth.ts                # Auth schema (users, sessions)
+│       └── warung.ts              # Business schema (products, transactions, etc.)
+├── lib/
+│   ├── api/                       # API utilities
+│   │   ├── auth-guard.ts          # Role-based route protection
+│   │   ├── client.ts              # API client helpers
+│   │   ├── responses.ts           # Standardized API responses
+│   │   └── validators.ts          # Zod request validators
+│   ├── services/                  # Business logic layer
+│   │   ├── product.service.ts     # Product CRUD operations
+│   │   ├── category.service.ts    # Category management
+│   │   ├── supplier.service.ts    # Supplier management
+│   │   ├── transaction.service.ts # Transaction processing
+│   │   ├── stock-in.service.ts    # Stock-in processing
+│   │   ├── stock-movement.service.ts # Movement log queries
+│   │   ├── report.service.ts      # Report generation
+│   │   └── user.service.ts        # User management
+│   ├── warung/                    # Frontend utilities
+│   │   ├── api.ts                 # Client-side API calls
+│   │   ├── types.ts               # TypeScript interfaces
+│   │   ├── format.ts              # Currency/date formatting
+│   │   ├── export.ts              # CSV/PDF export helpers
+│   │   ├── mock-data.ts           # Demo mock data
+│   │   └── demo-api.ts            # Demo API adapter
+│   ├── auth-client.ts             # Supabase auth client hooks
+│   ├── supabase.ts                # Browser Supabase client
+│   ├── supabase-server.ts         # Server-side Supabase client
+│   └── utils.ts                   # General utilities (cn)
+├── scripts/
+│   └── seed.ts                    # Database seeding script
+├── drizzle/                       # Drizzle migration files
+├── middleware.ts                   # Auth middleware (route protection)
+├── drizzle.config.ts              # Drizzle ORM configuration
+├── docker-compose.yaml            # Docker services (PostgreSQL)
+├── Dockerfile                     # Application container
+└── prd_warung_madura.md           # Product Requirements Document
 ```
 
 ## Diagram Teknis
@@ -410,11 +410,11 @@ erDiagram
 1. **Push to GitHub** and connect the repository to [Vercel](https://vercel.com)
 
 2. **Set environment variables** in the Vercel dashboard:
-   - `DATABASE_URL` â€” Supabase PostgreSQL connection string
-   - `NEXT_PUBLIC_SUPABASE_URL` â€” Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` â€” Supabase anon key
-   - `SUPABASE_SERVICE_ROLE_KEY` â€” Supabase service role key
-   - `NEXT_PUBLIC_SITE_URL` â€” Your production domain
+   - `DATABASE_URL` — Supabase PostgreSQL connection string
+   - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
+   - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key
+   - `NEXT_PUBLIC_SITE_URL` — Your production domain
 
 3. **Push database schema:**
    ```bash
@@ -435,8 +435,8 @@ erDiagram
 
 The application includes a fully functional demo mode accessible without authentication:
 
-- **Demo Dashboard:** [/demo/dashboard](http://localhost:3000/demo/dashboard) â€” Browse a pre-populated dashboard with mock data
-- **Demo POS:** [/demo/pos](http://localhost:3000/demo/pos) â€” Try the cashier interface with sample products
+- **Demo Dashboard:** [/demo/dashboard](http://localhost:3000/demo/dashboard) — Browse a pre-populated dashboard with mock data
+- **Demo POS:** [/demo/pos](http://localhost:3000/demo/pos) — Try the cashier interface with sample products
 
 ## Route Protection
 
