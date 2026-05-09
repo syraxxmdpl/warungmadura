@@ -468,6 +468,377 @@ erDiagram
 | User Management | ✅ | ❌ |
 | Settings | ✅ | ✅ |
 
+## Peta Situs
+
+```mermaid
+flowchart TD
+    Root["/ <br/> Warung Madura"]
+
+    subgraph Publik["Halaman Publik"]
+        direction LR
+        Home["/ <br/> Halaman Utama"]
+        SignIn["/sign-in <br/> Halaman Masuk"]
+        SignUp["/sign-up <br/> Halaman Daftar"]
+        AuthCB["/auth/callback <br/> Callback Autentikasi"]
+    end
+
+    subgraph DemoPages["Halaman Demo (Tanpa Login)"]
+        direction LR
+        DemoDash["/demo/dashboard <br/> Demo Dashboard"]
+        DemoPOS["/demo/pos <br/> Demo POS Kasir"]
+    end
+
+    subgraph App["Halaman Aplikasi (Perlu Login)"]
+        direction TB
+
+        subgraph Semua["Pemilik dan Kasir"]
+            direction LR
+            Dash["/dashboard <br/> Dashboard"]
+            POS["/pos <br/> POS Kasir"]
+            StockIn["/stock-in <br/> Stok Masuk"]
+            Trx["/transactions <br/> Riwayat Transaksi"]
+            Settings["/settings <br/> Pengaturan"]
+            Account["/account <br/> Akun Saya"]
+            Billing["/billing <br/> Tagihan"]
+            Notif["/notifications <br/> Notifikasi"]
+            Help["/help <br/> Bantuan"]
+        end
+
+        subgraph KhususPemilik["Khusus Pemilik"]
+            direction LR
+            Products["/products <br/> Manajemen Produk"]
+            Reports["/reports <br/> Laporan Keuangan"]
+            Users["/users <br/> Manajemen Pengguna"]
+        end
+    end
+
+    subgraph APIRoutes["Endpoint API (/api)"]
+        direction TB
+
+        subgraph APIAuth["Autentikasi"]
+            A1["/api/auth <br/> Login, Logout, Sesi"]
+        end
+
+        subgraph APIData["Data Bisnis"]
+            direction LR
+            A2["/api/products <br/> CRUD Produk"]
+            A3["/api/categories <br/> CRUD Kategori"]
+            A4["/api/suppliers <br/> CRUD Supplier"]
+            A5["/api/transactions <br/> Transaksi + Refund"]
+            A6["/api/stock-ins <br/> Stok Masuk"]
+            A7["/api/stock-movements <br/> Log Pergerakan Stok"]
+        end
+
+        subgraph APIReport["Pelaporan"]
+            direction LR
+            A8["/api/reports/dashboard <br/> Data Dashboard"]
+            A9["/api/reports/sales <br/> Laporan Penjualan"]
+        end
+
+        subgraph APISetting["Pengaturan dan Akun"]
+            direction LR
+            A10["/api/settings/profile <br/> Profil Pengguna"]
+            A11["/api/settings/password <br/> Ubah Password"]
+            A12["/api/users <br/> Manajemen Pengguna"]
+            A13["/api/account <br/> Info Akun"]
+            A14["/api/billing <br/> Info Tagihan"]
+            A15["/api/notifications <br/> Notifikasi"]
+        end
+
+        subgraph APIDemo["Demo"]
+            A16["/api/demo <br/> Data Contoh"]
+        end
+    end
+
+    Root --> Publik
+    Root --> DemoPages
+    Root --> App
+    Root --> APIRoutes
+
+    %% Styling
+    classDef publicNode fill:#10b981,stroke:#059669,color:#fff
+    classDef demoNode fill:#14b8a6,stroke:#0d9488,color:#fff
+    classDef sharedNode fill:#3b82f6,stroke:#2563eb,color:#fff
+    classDef ownerNode fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    classDef apiNode fill:#f59e0b,stroke:#d97706,color:#000
+    classDef rootNode fill:#1e293b,stroke:#0f172a,color:#fff
+
+    class Root rootNode
+    class Home,SignIn,SignUp,AuthCB publicNode
+    class DemoDash,DemoPOS demoNode
+    class Dash,POS,StockIn,Trx,Settings,Account,Billing,Notif,Help sharedNode
+    class Products,Reports,Users ownerNode
+    class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16 apiNode
+```
+
+### Keterangan Warna
+
+| Warna | Akses |
+|-------|-------|
+| Hijau | Halaman publik — dapat diakses tanpa login |
+| Teal | Halaman demo — data contoh tanpa autentikasi |
+| Biru | Halaman aplikasi — pemilik dan kasir |
+| Ungu | Halaman khusus pemilik — produk, laporan, pengguna |
+| Kuning | Endpoint API — diakses oleh klien melalui HTTP |
+
+## Wireframe Antarmuka
+
+### Tata Letak Utama Aplikasi
+
+```mermaid
+block-beta
+    columns 5
+
+    block:sidebar:1
+        columns 1
+        logo["Warung Madura"]
+        space
+        nav1["Dashboard"]
+        nav2["POS Kasir"]
+        nav3["Produk"]
+        nav4["Stok Masuk"]
+        nav5["Transaksi"]
+        nav6["Laporan"]
+        nav7["Pengguna"]
+        space
+        nav8["Pengaturan"]
+        nav9["Bantuan"]
+        space
+        user["Profil Pengguna"]
+    end
+
+    block:main:4
+        columns 4
+        header["Header - Judul Halaman | Pencarian | Tema Gelap/Terang"]:4
+        space:4
+        content["Area Konten Halaman"]:4
+    end
+
+    style sidebar fill:#1e293b,stroke:#334155,color:#fff
+    style header fill:#f8fafc,stroke:#e2e8f0,color:#0f172a
+    style content fill:#ffffff,stroke:#e2e8f0,color:#64748b
+    style logo fill:#f59e0b,stroke:#d97706,color:#fff
+    style nav1 fill:#3b82f6,stroke:#2563eb,color:#fff
+    style nav2 fill:#3b82f6,stroke:#2563eb,color:#fff
+    style nav3 fill:#3b82f6,stroke:#2563eb,color:#fff
+    style nav4 fill:#3b82f6,stroke:#2563eb,color:#fff
+    style nav5 fill:#3b82f6,stroke:#2563eb,color:#fff
+    style nav6 fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style nav7 fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style nav8 fill:#64748b,stroke:#475569,color:#fff
+    style nav9 fill:#64748b,stroke:#475569,color:#fff
+    style user fill:#334155,stroke:#475569,color:#cbd5e1
+```
+
+### Wireframe Dashboard
+
+```mermaid
+block-beta
+    columns 4
+
+    kpi1["Penjualan Hari Ini\nRp 1.245.000"]:1
+    kpi2["Jumlah Transaksi\n37"]:1
+    kpi3["Laba Kotor\nRp 312.500"]:1
+    kpi4["Stok Rendah\n4 produk"]:1
+
+    chart["Grafik Tren Penjualan 7 Hari\n(Recharts Line Chart)"]:3
+    lowstock["Panel Stok Rendah\n- Teh Pucuk: 2 pcs\n- Oreo: 3 pcs\n- Minyak Goreng: 1 pcs\n- Sprite: 4 pcs"]:1
+
+    trxlive["Transaksi Terbaru\n- #a1b2c3 Rp 45.000 Tunai\n- #d4e5f6 Rp 23.500 QRIS\n- #g7h8i9 Rp 67.000 Transfer"]:2
+    topprods["Produk Terlaris\n1. Indomie Goreng - 42 pcs\n2. Aqua 600ml - 38 pcs\n3. Teh Pucuk - 29 pcs\n4. Gudang Garam - 25 pcs\n5. Mie Sedaap - 21 pcs"]:2
+
+    style kpi1 fill:#10b981,stroke:#059669,color:#fff
+    style kpi2 fill:#3b82f6,stroke:#2563eb,color:#fff
+    style kpi3 fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style kpi4 fill:#f59e0b,stroke:#d97706,color:#000
+    style chart fill:#f0f9ff,stroke:#bae6fd,color:#0c4a6e
+    style lowstock fill:#fef3c7,stroke:#fcd34d,color:#92400e
+    style trxlive fill:#f0fdf4,stroke:#bbf7d0,color:#14532d
+    style topprods fill:#faf5ff,stroke:#e9d5ff,color:#581c87
+```
+
+### Wireframe POS Kasir
+
+```mermaid
+block-beta
+    columns 3
+
+    block:prodpanel:2
+        columns 1
+        prodheader["Pilih Produk | Pencarian SKU/Nama"]
+        cattabs["Tab Kategori: Semua | Makanan | Minuman | Rokok | Sembako"]
+        block:grid
+            columns 4
+            p1["Indomie Goreng\nRp 3.500\nStok: 120 pcs"]
+            p2["Aqua 600ml\nRp 4.000\nStok: 85 pcs"]
+            p3["Gudang Garam\nRp 28.000\nStok: 45 pcs"]
+            p4["Teh Pucuk\nRp 4.500\nStok: 2 pcs"]
+            p5["Mie Sedaap\nRp 3.200\nStok: 90 pcs"]
+            p6["Oreo\nRp 12.000\nStok: 3 pcs"]
+            p7["Sprite 390ml\nRp 5.000\nStok: 4 pcs"]
+            p8["Minyak 1L\nRp 18.000\nStok: 1 pcs"]
+        end
+    end
+
+    block:cartpanel:1
+        columns 1
+        carttitle["Keranjang (3 item)"]
+        item1["Indomie Goreng x2 = Rp 7.000\n[-] 2 [+] [Hapus]"]
+        item2["Aqua 600ml x1 = Rp 4.000\n[-] 1 [+] [Hapus]"]
+        item3["Gudang Garam x1 = Rp 28.000\n[-] 1 [+] [Hapus]"]
+        separator["---"]
+        subtotal["Subtotal: Rp 39.000\nTotal: Rp 39.000"]
+        payment["Metode: [Tunai] [QRIS] [Transfer]"]
+        cashfield["Uang Diterima: Rp 50.000\nKembalian: Rp 11.000"]
+        paybtn["Bayar dan Cetak Struk"]
+    end
+
+    style prodheader fill:#f8fafc,stroke:#e2e8f0,color:#0f172a
+    style cattabs fill:#f1f5f9,stroke:#cbd5e1,color:#334155
+    style p1 fill:#ffffff,stroke:#e2e8f0,color:#1e293b
+    style p2 fill:#ffffff,stroke:#e2e8f0,color:#1e293b
+    style p3 fill:#ffffff,stroke:#e2e8f0,color:#1e293b
+    style p4 fill:#fef2f2,stroke:#fca5a5,color:#991b1b
+    style p5 fill:#ffffff,stroke:#e2e8f0,color:#1e293b
+    style p6 fill:#fef2f2,stroke:#fca5a5,color:#991b1b
+    style p7 fill:#fef2f2,stroke:#fca5a5,color:#991b1b
+    style p8 fill:#fef2f2,stroke:#fca5a5,color:#991b1b
+    style carttitle fill:#1e293b,stroke:#334155,color:#fff
+    style paybtn fill:#3b82f6,stroke:#2563eb,color:#fff
+    style subtotal fill:#f0fdf4,stroke:#bbf7d0,color:#14532d
+    style payment fill:#faf5ff,stroke:#e9d5ff,color:#581c87
+```
+
+### Wireframe Manajemen Produk
+
+```mermaid
+block-beta
+    columns 4
+
+    title["Katalog Produk - N produk terdaftar"]:3
+    addbtn["+ Tambah Produk"]:1
+
+    search["Pencarian nama / SKU"]:2
+    catfilter["Filter: Semua Kategori"]:2
+
+    block:table:4
+        columns 6
+        h1["Produk"]
+        h2["Kategori"]
+        h3["Harga Beli"]
+        h4["Harga Jual"]
+        h5["Stok"]
+        h6["Aksi"]
+        d1["Indomie Goreng\nSKU-001"]
+        d2["Makanan"]
+        d3["Rp 2.800"]
+        d4["Rp 3.500"]
+        d5["120 pcs"]
+        d6["Edit | Hapus"]
+        e1["Aqua 600ml\nSKU-002"]
+        e2["Minuman"]
+        e3["Rp 2.500"]
+        e4["Rp 4.000"]
+        e5["85 pcs"]
+        e6["Edit | Hapus"]
+        f1["Teh Pucuk\nSKU-003"]
+        f2["Minuman"]
+        f3["Rp 3.000"]
+        f4["Rp 4.500"]
+        f5["2 pcs"]
+        f6["Edit | Hapus"]
+    end
+
+    style title fill:#f8fafc,stroke:#e2e8f0,color:#0f172a
+    style addbtn fill:#3b82f6,stroke:#2563eb,color:#fff
+    style search fill:#ffffff,stroke:#e2e8f0,color:#64748b
+    style catfilter fill:#ffffff,stroke:#e2e8f0,color:#64748b
+    style h1 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style h2 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style h3 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style h4 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style h5 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style h6 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style f5 fill:#fef2f2,stroke:#fca5a5,color:#991b1b
+```
+
+### Wireframe Laporan Keuangan
+
+```mermaid
+block-beta
+    columns 5
+
+    block:filterbar:5
+        columns 5
+        period["Periode:\n7 Hari"]
+        datefrom["Dari:\n2026-05-02"]
+        dateto["Sampai:\n2026-05-09"]
+        cashierfilter["Kasir:\nSemua"]
+        block:actions
+            columns 1
+            refresh["Perbarui"]
+            exports["Export CSV | PDF"]
+        end
+    end
+
+    rk1["Transaksi\n37"]:1
+    rk2["Pendapatan\nRp 1.245.000"]:1
+    rk3["HPP\nRp 932.500"]:1
+    rk4["Laba Kotor\nRp 312.500"]:1
+    rk5["Margin\n25.1%"]:1
+
+    block:cattable:5
+        columns 4
+        ch1["Kategori"]
+        ch2["Qty"]
+        ch3["Pendapatan"]
+        ch4["HPP"]
+        cd1["Makanan Ringan"]
+        cd2["120"]
+        cd3["Rp 450.000"]
+        cd4["Rp 336.000"]
+        cd5["Minuman"]
+        cd6["95"]
+        cd7["Rp 380.000"]
+        cd8["Rp 285.000"]
+    end
+
+    block:trxtable:5
+        columns 6
+        th1["ID"]
+        th2["Tanggal"]
+        th3["Kasir"]
+        th4["Metode"]
+        th5["Total"]
+        th6["Laba"]
+        td1["#a1b2c3"]
+        td2["09 Mei 2026"]
+        td3["Ahmad"]
+        td4["TUNAI"]
+        td5["Rp 45.000"]
+        td6["Rp 11.250"]
+    end
+
+    style period fill:#ffffff,stroke:#e2e8f0,color:#334155
+    style refresh fill:#64748b,stroke:#475569,color:#fff
+    style exports fill:#f59e0b,stroke:#d97706,color:#000
+    style rk1 fill:#3b82f6,stroke:#2563eb,color:#fff
+    style rk2 fill:#10b981,stroke:#059669,color:#fff
+    style rk3 fill:#ef4444,stroke:#dc2626,color:#fff
+    style rk4 fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style rk5 fill:#f59e0b,stroke:#d97706,color:#000
+    style ch1 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style ch2 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style ch3 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style ch4 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style th1 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style th2 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style th3 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style th4 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style th5 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+    style th6 fill:#f1f5f9,stroke:#e2e8f0,color:#334155
+```
+
 ## Alur Pengguna
 
 ```mermaid
