@@ -241,69 +241,69 @@ The application uses a relational schema with the following core tables:
 | User Management | ✅ | ❌ |
 | Settings | ✅ | ✅ |
 
-## User Flow
+## Alur Pengguna
 
 ```mermaid
 flowchart TD
-    Start([🌐 User visits site]) --> Landing[📄 Landing Page<br/><i>/</i>]
+    Start(["Pengguna mengunjungi situs"]) --> Landing["Halaman Utama<br/>/"]
 
-    Landing --> SignIn[🔑 Sign In<br/><i>/sign-in</i>]
-    Landing --> SignUp[📝 Sign Up<br/><i>/sign-up</i>]
-    Landing --> Demo[🎮 Demo Mode]
+    Landing --> SignIn["Masuk<br/>/sign-in"]
+    Landing --> SignUp["Daftar<br/>/sign-up"]
+    Landing --> Demo["Mode Demo"]
 
-    %% Authentication Flow
-    SignIn -->|Email + Password| AuthCheck{🔐 Supabase Auth<br/>Session Valid?}
-    SignUp -->|Create Account| AuthCheck
+    %% Alur Autentikasi
+    SignIn -->|"Email dan Password"| AuthCheck{"Supabase Auth<br/>Sesi Valid?"}
+    SignUp -->|"Buat Akun"| AuthCheck
 
-    AuthCheck -->|❌ Failed| SignIn
-    AuthCheck -->|✅ Success| Middleware{🛡️ Middleware<br/>Route Protection}
+    AuthCheck -->|"Gagal"| SignIn
+    AuthCheck -->|"Berhasil"| Middleware{"Middleware<br/>Proteksi Rute"}
 
-    %% Middleware checks
-    Middleware -->|Session Valid| RoleCheck{👤 Role Check}
-    Middleware -->|No Session| RedirectSignIn[↩️ Redirect to<br/>Sign In]
+    %% Pemeriksaan Middleware
+    Middleware -->|"Sesi Valid"| RoleCheck{"Pemeriksaan Peran"}
+    Middleware -->|"Tidak Ada Sesi"| RedirectSignIn["Dialihkan ke<br/>Halaman Masuk"]
     RedirectSignIn --> SignIn
 
-    %% Role-based access
-    RoleCheck -->|owner| OwnerDash[📊 Dashboard<br/><i>Full KPIs, trends, alerts</i>]
-    RoleCheck -->|cashier| CashierDash[📊 Dashboard<br/><i>Limited view</i>]
+    %% Akses berdasarkan peran
+    RoleCheck -->|"Pemilik"| OwnerDash["Dashboard<br/>KPI lengkap, tren, peringatan"]
+    RoleCheck -->|"Kasir"| CashierDash["Dashboard<br/>Tampilan terbatas"]
 
-    %% Owner navigation
-    OwnerDash --> POS[🛒 POS Kasir<br/><i>/pos</i>]
-    OwnerDash --> Products[📦 Produk<br/><i>/products</i>]
-    OwnerDash --> StockIn[📥 Stok Masuk<br/><i>/stock-in</i>]
-    OwnerDash --> Transactions[💰 Transaksi<br/><i>/transactions</i>]
-    OwnerDash --> Reports[📈 Laporan<br/><i>/reports — owner only</i>]
-    OwnerDash --> Users[👥 Pengguna<br/><i>/users — owner only</i>]
-    OwnerDash --> Settings[⚙️ Pengaturan<br/><i>/settings</i>]
+    %% Navigasi Pemilik
+    OwnerDash --> POS["POS Kasir<br/>/pos"]
+    OwnerDash --> Products["Produk<br/>/products"]
+    OwnerDash --> StockIn["Stok Masuk<br/>/stock-in"]
+    OwnerDash --> Transactions["Transaksi<br/>/transactions"]
+    OwnerDash --> Reports["Laporan<br/>/reports - khusus pemilik"]
+    OwnerDash --> Users["Pengguna<br/>/users - khusus pemilik"]
+    OwnerDash --> Settings["Pengaturan<br/>/settings"]
 
-    %% Cashier navigation (limited)
+    %% Navigasi Kasir - terbatas
     CashierDash --> POS
     CashierDash --> StockIn
     CashierDash --> Transactions
     CashierDash --> Settings
 
-    %% POS sub-flow
-    POS -->|Add items to cart| ProcessSale[💳 Process Sale<br/><i>Cash / QRIS / Transfer</i>]
-    ProcessSale -->|Auto stock deduction| Transactions
+    %% Sub-alur POS
+    POS -->|"Tambah item ke keranjang"| ProcessSale["Proses Penjualan<br/>Tunai / QRIS / Transfer"]
+    ProcessSale -->|"Stok berkurang otomatis"| Transactions
 
-    %% Stock-In sub-flow
-    StockIn -->|Record from supplier| StockUpdate[📦 Stock Updated<br/><i>+ movement log</i>]
+    %% Sub-alur Stok Masuk
+    StockIn -->|"Catat dari supplier"| StockUpdate["Stok Diperbarui<br/>dicatat di log pergerakan"]
 
-    %% Products sub-flow (owner)
-    Products -->|CRUD operations| ProductMgmt[🏷️ Manage SKU, Price,<br/>Categories, Min Stock]
+    %% Sub-alur Produk - khusus pemilik
+    Products -->|"Kelola data produk"| ProductMgmt["Kelola SKU, Harga,<br/>Kategori, Stok Minimum"]
 
-    %% Reports sub-flow (owner)
-    Reports --> ExportReport[📄 Export<br/><i>CSV / PDF</i>]
+    %% Sub-alur Laporan - khusus pemilik
+    Reports --> ExportReport["Ekspor<br/>CSV / PDF"]
 
-    %% User Management sub-flow (owner)
-    Users --> ManageUsers[👤 Add/Edit Users<br/><i>Assign owner/cashier role</i>]
+    %% Sub-alur Manajemen Pengguna - khusus pemilik
+    Users --> ManageUsers["Tambah/Edit Pengguna<br/>Tetapkan peran pemilik/kasir"]
 
-    %% Demo flow (no auth required)
-    Demo --> DemoDash[📊 Demo Dashboard<br/><i>/demo/dashboard</i>]
-    Demo --> DemoPOS[🛒 Demo POS<br/><i>/demo/pos</i>]
+    %% Alur Demo - tanpa autentikasi
+    Demo --> DemoDash["Demo Dashboard<br/>/demo/dashboard"]
+    Demo --> DemoPOS["Demo POS<br/>/demo/pos"]
 
-    %% Logout
-    Settings --> Logout[🚪 Sign Out]
+    %% Keluar
+    Settings --> Logout["Keluar"]
     Logout --> Landing
 
     %% Styling
@@ -320,16 +320,178 @@ flowchart TD
     class RedirectSignIn dangerNode
 ```
 
-### Flow Summary
+### Ringkasan Alur
 
-| Path | Description |
-|------|-------------|
-| **Sign Up → Dashboard** | New user registers → Supabase creates session → middleware validates → redirected to `/dashboard` |
-| **Sign In → Dashboard** | Existing user authenticates → session cookie set → middleware passes → role-based dashboard |
-| **Owner Flow** | Full access: Dashboard, POS, Products (CRUD), Stock-In, Transactions, Reports, Users, Settings |
-| **Cashier Flow** | Limited access: Dashboard (limited), POS, Stock-In, Transactions, Settings |
-| **Demo Flow** | No authentication required — public `/demo/dashboard` and `/demo/pos` with mock data |
-| **Protected Route** | Unauthenticated access to any protected route → middleware redirects to `/sign-in?redirect=...` |
+| Alur | Deskripsi |
+|------|-----------|
+| **Daftar ke Dashboard** | Pengguna baru mendaftar, Supabase membuat sesi, middleware memvalidasi, diarahkan ke `/dashboard` |
+| **Masuk ke Dashboard** | Pengguna login, cookie sesi diatur, middleware melewatkan, dashboard sesuai peran |
+| **Alur Pemilik** | Akses penuh: Dashboard, POS, Produk (CRUD), Stok Masuk, Transaksi, Laporan, Pengguna, Pengaturan |
+| **Alur Kasir** | Akses terbatas: Dashboard (terbatas), POS, Stok Masuk, Transaksi, Pengaturan |
+| **Alur Demo** | Tanpa autentikasi — halaman publik `/demo/dashboard` dan `/demo/pos` dengan data contoh |
+| **Rute Terlindungi** | Akses tanpa login ke rute terlindungi akan dialihkan ke `/sign-in?redirect=...` |
+
+### Use Case Diagram
+
+```mermaid
+flowchart LR
+    subgraph Aktor
+        Pemilik["Pemilik (Owner)"]
+        Kasir["Kasir (Cashier)"]
+        Pengunjung["Pengunjung"]
+    end
+
+    subgraph Sistem["Sistem Warung Madura"]
+        UC1["Masuk / Daftar"]
+        UC2["Lihat Dashboard"]
+        UC3["Proses Penjualan POS"]
+        UC4["Catat Stok Masuk"]
+        UC5["Lihat Riwayat Transaksi"]
+        UC6["Kelola Produk CRUD"]
+        UC7["Lihat Laporan Keuangan"]
+        UC8["Ekspor Laporan CSV/PDF"]
+        UC9["Kelola Pengguna"]
+        UC10["Refund Transaksi"]
+        UC11["Ubah Pengaturan"]
+        UC12["Lihat Demo Dashboard"]
+        UC13["Lihat Demo POS"]
+    end
+
+    Pemilik --- UC1
+    Pemilik --- UC2
+    Pemilik --- UC3
+    Pemilik --- UC4
+    Pemilik --- UC5
+    Pemilik --- UC6
+    Pemilik --- UC7
+    Pemilik --- UC8
+    Pemilik --- UC9
+    Pemilik --- UC10
+    Pemilik --- UC11
+
+    Kasir --- UC1
+    Kasir --- UC2
+    Kasir --- UC3
+    Kasir --- UC4
+    Kasir --- UC5
+    Kasir --- UC11
+
+    Pengunjung --- UC12
+    Pengunjung --- UC13
+
+    UC7 -. "include" .-> UC8
+    UC3 -. "include" .-> UC5
+```
+
+### Activity Diagram - Proses Penjualan POS
+
+```mermaid
+flowchart TD
+    A(["Mulai"]) --> B["Kasir membuka halaman POS"]
+    B --> C["Pilih produk dan tentukan jumlah"]
+    C --> D["Tambah item ke keranjang"]
+    D --> E{"Tambah item lagi?"}
+    E -->|"Ya"| C
+    E -->|"Tidak"| F["Pilih metode pembayaran<br/>Tunai / QRIS / Transfer"]
+    F --> G["Klik tombol Proses Penjualan"]
+    G --> H{"Validasi stok<br/>semua item tersedia?"}
+    H -->|"Stok tidak cukup"| I["Tampilkan pesan error<br/>stok tidak mencukupi"]
+    I --> C
+    H -->|"Stok tersedia"| J["Buat record transaksi"]
+    J --> K["Simpan item transaksi<br/>dengan snapshot harga"]
+    K --> L["Kurangi stok produk<br/>untuk setiap item"]
+    L --> M["Catat log pergerakan stok<br/>tipe: keluar, referensi: transaksi"]
+    M --> N["Transaksi berhasil<br/>status: completed"]
+    N --> O(["Selesai"])
+
+    classDef processNode fill:#3b82f6,stroke:#2563eb,color:#fff
+    classDef decisionNode fill:#f59e0b,stroke:#d97706,color:#000
+    classDef errorNode fill:#ef4444,stroke:#dc2626,color:#fff
+
+    class B,C,D,F,G,J,K,L,M,N processNode
+    class E,H decisionNode
+    class I errorNode
+```
+
+### Sequence Diagram - Autentikasi dan Akses API
+
+```mermaid
+sequenceDiagram
+    participant P as Pengguna (Browser)
+    participant MW as Middleware Next.js
+    participant API as API Route Handler
+    participant AG as Auth Guard
+    participant SB as Supabase Auth
+    participant DB as Database PostgreSQL
+
+    Note over P,DB: Proses Login
+    P->>SB: POST /auth - email dan password
+    SB-->>P: Sesi token (cookie)
+
+    Note over P,DB: Akses Halaman Terlindungi
+    P->>MW: GET /dashboard
+    MW->>SB: Validasi cookie sesi
+    SB-->>MW: Data sesi pengguna
+
+    alt Sesi tidak valid
+        MW-->>P: Redirect ke /sign-in?redirect=/dashboard
+    else Sesi valid
+        MW-->>P: Lanjutkan ke halaman
+    end
+
+    Note over P,DB: Panggilan API (contoh: buat transaksi)
+    P->>API: POST /api/transactions
+    API->>AG: getAuthContext()
+    AG->>SB: Ambil sesi dari cookie
+    SB-->>AG: Data sesi
+    AG->>DB: Query profil pengguna dan peran
+    DB-->>AG: Profil pengguna (pemilik/kasir)
+
+    alt Pengguna tidak aktif
+        AG-->>API: Error 403 - Akun dinonaktifkan
+        API-->>P: Response 403
+    else Pengguna aktif
+        AG-->>API: AuthContext (userId, role)
+        API->>DB: Validasi stok produk
+        DB-->>API: Data stok tersedia
+        API->>DB: INSERT transaksi, item, update stok, log movement
+        DB-->>API: Transaksi berhasil
+        API-->>P: Response 200 - Data transaksi
+    end
+```
+
+### State Diagram - Status Transaksi
+
+```mermaid
+stateDiagram-v2
+    [*] --> Dibuat : Kasir membuat transaksi baru
+
+    Dibuat --> ValidasiStok : Sistem memeriksa ketersediaan stok
+
+    ValidasiStok --> Gagal : Stok tidak mencukupi
+    Gagal --> [*] : Transaksi dibatalkan, tampilkan error
+
+    ValidasiStok --> Diproses : Stok tersedia untuk semua item
+
+    Diproses --> Selesai : Stok dikurangi, pembayaran tercatat,\nlog pergerakan dibuat
+
+    Selesai --> Direfund : Pemilik memproses refund
+    Direfund --> [*] : Stok dikembalikan,\nlog pergerakan tipe masuk dicatat
+
+    Selesai --> [*] : Transaksi final
+
+    note right of Selesai
+        Status: completed
+        Stok sudah berkurang
+        Metode bayar: Tunai/QRIS/Transfer
+    end note
+
+    note right of Direfund
+        Status: refunded
+        Stok dikembalikan ke produk
+        Hanya bisa dari status completed
+    end note
+```
 
 ## Development Commands
 
